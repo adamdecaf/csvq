@@ -18,21 +18,26 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/adamdecaf/csvq/internal/cli"
+	"github.com/adamdecaf/csvq/internal/format"
 )
 
 var (
 	flagDelimiter   = flag.String("d", ",", "Delimiter used to separate records")
 	flagShowHeaders = flag.Bool("headers", false, "Print headers as first output line")
-	flagKeepCols    = flag.String("keep", "", "Column headers to keep in output")
+
+	flagKeepCols = flag.String("keep", "", "Column headers to keep in output")
+	// flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output") // TODO(adam):
+	// flagIndices    = flag.String("i", "", "Indicies to keep in output")
+	// flagNotIndices = flag.String("I", "", "Indicies to remove from output")
+
+	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table
 
 	flagVerbose = flag.Bool("v", false, "Enable verbose logging")
 	flagVersion = flag.Bool("version", false, "Print the version of csvq")
@@ -52,57 +57,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	opts := cli.FileOpts{
+		Delimiter:   toRune(*flagDelimiter),
+		ShowHeaders: *flagShowHeaders,
+		KeepCols:    splitStringList(*flagKeepCols),
+	}
+
 	for i := range files {
 		if *flagVerbose {
 			fmt.Printf("Processing %s\n", files[i].Name())
 		}
 
-		rdr := csv.NewReader(files[i])
-		rdr.Comma = toRune(*flagDelimiter)
-
-		headerIndexes := make(map[int]string)
-
-		lineNumber := 0
-		for {
-			lineNumber += 1
-
-			cols, err := rdr.Read()
-			if err != nil {
-				if err == io.EOF {
-					if *flagVerbose {
-						fmt.Println("Finished processing")
-					}
-					break
-				}
-				fmt.Printf("ERROR reading line %d failed: %v", lineNumber, err)
-				os.Exit(1)
-			}
-
-			if lineNumber == 1 && *flagShowHeaders {
-				fmt.Println(strings.Join(cols, ", ")) // TODO(adam): text/tabwriter
-			}
-
-			if lineNumber == 1 {
-				toKeep := strings.Split(*flagKeepCols, ",")
-
-				for i := range cols {
-					for j := range toKeep {
-						if strings.EqualFold(strings.TrimSpace(cols[i]), strings.TrimSpace(toKeep[j])) {
-							headerIndexes[i] = strings.TrimSpace(cols[i])
-						}
-					}
-				}
-
-				fmt.Printf("%#v\n", headerIndexes)
-			} else {
-				for i := range cols {
-					if _, exists := headerIndexes[i]; exists {
-						// TODO(adam): tabwriter
-						fmt.Printf("  %s", cols[i])
-					}
-				}
-				fmt.Printf("\n")
-			}
+		output, err := cli.HandleFile(opts, files[i])
+		if err != nil {
+			fmt.Printf("ERROR with %s handler: %v", files[i], err)
+			os.Exit(1)
+		}
+		err = format.WriteFile(os.Stdout, *flagFormat, output)
+		if err != nil {
+			fmt.Printf("ERROR writing output: %v", err)
 		}
 	}
 }
@@ -112,4 +85,12 @@ func toRune(delim string) rune {
 		return ',' // delim is invalid
 	}
 	return rune(delim[0])
+}
+
+func splitStringList(input string) []string {
+	ss := strings.Split(input, ",")
+	for i := range ss {
+		ss[i] = strings.TrimSpace(ss[i])
+	}
+	return ss
 }
