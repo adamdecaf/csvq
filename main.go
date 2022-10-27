@@ -39,6 +39,9 @@ var (
 
 	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table
 
+	// TODO(adam): flag to sort output (useful w/ '-format table')
+	// IDEA: -sort.asc/-sort.desc 1 (index) or last_name (col name)
+
 	// TODO(adam): -exec flag to call external program on PATH
 	//  could we format command with $1, $2 or $first_name, $last_name values?
 
