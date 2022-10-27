@@ -33,7 +33,7 @@ func HandleFile(opts FileOpts, file *os.File) (*File, error) {
 	rdr.Comma = opts.Delimiter
 
 	// Until we handle flagIndices or flagNotIndices we assume the first record contains headers
-	headerIndexes := make(map[int]string)
+	headerIndexes := make(map[int]int) // index within input file -> index in output
 	headers, err := rdr.Read()
 	if err != nil {
 		if err == io.EOF {
@@ -43,14 +43,14 @@ func HandleFile(opts FileOpts, file *os.File) (*File, error) {
 	}
 
 	toKeep := opts.KeepCols
-	for i := range headers {
+	for headIdx := range headers {
 		if len(toKeep) == 0 {
-			headerIndexes[i] = strings.TrimSpace(headers[i])
+			headerIndexes[headIdx] = headIdx // keep all cols, so maintain order
 		}
 
-		for j := range toKeep {
-			if strings.EqualFold(strings.TrimSpace(headers[i]), strings.TrimSpace(toKeep[j])) {
-				headerIndexes[i] = strings.TrimSpace(headers[i])
+		for keepIdx := range toKeep {
+			if strings.EqualFold(strings.TrimSpace(headers[headIdx]), strings.TrimSpace(toKeep[keepIdx])) {
+				headerIndexes[headIdx] = keepIdx
 			}
 		}
 	}
@@ -70,10 +70,10 @@ func HandleFile(opts FileOpts, file *os.File) (*File, error) {
 			return nil, fmt.Errorf("line %d failed to parse: %v", lineNumber, err)
 		}
 
-		var line Line
+		line := make(Line, len(toKeep))
 		for i := range cols {
-			if _, exists := headerIndexes[i]; exists {
-				line = append(line, cols[i])
+			if keepIdx, exists := headerIndexes[i]; exists {
+				line[keepIdx] = cols[i] // format output according to -keep order
 			}
 		}
 
