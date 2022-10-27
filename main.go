@@ -51,6 +51,7 @@ var (
 )
 
 func main() {
+	flag.Usage = help
 	flag.Parse()
 
 	if *flagVersion {
