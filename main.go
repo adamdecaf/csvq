@@ -37,6 +37,7 @@ var (
 	// flagIndices    = flag.String("i", "", "Indicies to keep in output")
 	// flagNotIndices = flag.String("I", "", "Indicies to remove from output")
 
+	// TODO(adam): alias '-format' to '-as' ?
 	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table
 
 	// TODO(adam): flag to sort output (useful w/ '-format table')
