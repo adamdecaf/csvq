@@ -68,7 +68,7 @@ func main() {
 
 		output, err := cli.HandleFile(opts, files[i])
 		if err != nil {
-			fmt.Printf("ERROR with %s handler: %v", files[i], err)
+			fmt.Printf("ERROR with %s handler: %v", files[i].Name(), err)
 			os.Exit(1)
 		}
 		err = format.WriteFile(os.Stdout, *flagFormat, output)

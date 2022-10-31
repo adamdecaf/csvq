@@ -23,7 +23,7 @@ import (
 )
 
 func help() {
-	fmt.Printf(strings.TrimSpace(fmt.Sprintf(`
+	fmt.Printf(strings.TrimSpace(`
 csvq is a tool for parsing and transforming comma separated values (CSV) files. This tool allows
 for flexible transforms of data files.
 
@@ -52,7 +52,7 @@ Output CSV columns in a table.
 
 Combine multiple files.
    csvq -keep user_id,email ~/Downloads/report1.csv ~/Downloads/report2.csv
-`, Version)))
+`), Version)
 
 	// TODO(adam): support additional flags
 	// // flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output")
