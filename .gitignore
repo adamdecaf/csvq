@@ -15,5 +15,6 @@
 # vendor/
 
 /bin/
+/dist/
 coverage.txt
 lint-project.sh
