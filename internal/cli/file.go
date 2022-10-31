@@ -19,6 +19,7 @@ type FileOpts struct {
 type File struct {
 	Headers []string
 	Lines   []Line
+	Opts    FileOpts
 }
 
 type Line []string
@@ -42,21 +43,24 @@ func HandleFile(opts FileOpts, file *os.File) (*File, error) {
 		return nil, err
 	}
 
+	output := File{
+		Opts: opts,
+	}
+
 	toKeep := opts.KeepCols
 	for headIdx := range headers {
 		if len(toKeep) == 0 {
 			headerIndexes[headIdx] = headIdx // keep all cols, so maintain order
+			output.Headers = append(output.Headers, headers[headIdx])
 		}
 
 		for keepIdx := range toKeep {
 			if strings.EqualFold(strings.TrimSpace(headers[headIdx]), strings.TrimSpace(toKeep[keepIdx])) {
 				headerIndexes[headIdx] = keepIdx
+				output.Headers = append(output.Headers, toKeep[keepIdx])
 			}
 		}
 	}
-
-	var output File
-	// TODO(adam): populate output.Headers
 
 	lineNumber := 1
 	for {

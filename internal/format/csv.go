@@ -28,7 +28,9 @@ func writeCSV(ww io.Writer, file *cli.File) error {
 	w := csv.NewWriter(ww)
 	defer w.Flush()
 
-	// TODO(adam): write headers
+	if file.Opts.ShowHeaders {
+		w.Write(file.Headers)
+	}
 
 	for i := range file.Lines {
 		w.Write(file.Lines[i])

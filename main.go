@@ -38,7 +38,7 @@ var (
 	// flagNotIndices = flag.String("I", "", "Indicies to remove from output")
 
 	// TODO(adam): alias '-format' to '-as' ?
-	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table
+	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table, web
 
 	// TODO(adam): flag to sort output (useful w/ '-format table')
 	// IDEA: -sort.asc/-sort.desc 1 (index) or last_name (col name)
