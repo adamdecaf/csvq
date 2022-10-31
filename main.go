@@ -33,18 +33,8 @@ var (
 	flagShowHeaders = flag.Bool("headers", false, "Print headers as first output line")
 
 	flagKeepCols = flag.String("keep", "", "Column headers to keep in output. Order of kept headers is maintained in output.")
-	// flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output") // TODO(adam):
-	// flagIndices    = flag.String("i", "", "Indicies to keep in output")
-	// flagNotIndices = flag.String("I", "", "Indicies to remove from output")
 
-	// TODO(adam): alias '-format' to '-as' ?
-	flagFormat = flag.String("format", "", "Format to output resulting records in") // TODO(adam): csv, tabs, table, web
-
-	// TODO(adam): flag to sort output (useful w/ '-format table')
-	// IDEA: -sort.asc/-sort.desc 1 (index) or last_name (col name)
-
-	// TODO(adam): -exec flag to call external program on PATH
-	//  could we format command with $1, $2 or $first_name, $last_name values?
+	flagFormat = flag.String("format", "", "Format to output resulting records in")
 
 	flagVerbose = flag.Bool("v", false, "Enable verbose logging")
 	flagVersion = flag.Bool("version", false, "Print the version of csvq")

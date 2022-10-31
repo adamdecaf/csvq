@@ -33,6 +33,8 @@ func WriteFile(w io.Writer, format string, file *cli.File) error {
 		// TODO(adam):
 	case "table":
 		// TODO(adam):
+	case "web":
+		// TODO(adam):
 	}
 	return fmt.Errorf("unexpected %s format option", format)
 }

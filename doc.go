@@ -32,7 +32,7 @@ COMMAND LINE
    -d <rune>             Delimiter used to separate records. (Default: ',')
    -keep <string-list>   Column headers to keep in output. Order of kept headers is maintained in output.
 
-   -headers              // TODO(adam):
+   -headers              Show headers in output.
 
    -format <string>      Layout to print resulting records in. (Default: csv, Options: csv, tabs, table)
 
@@ -54,8 +54,8 @@ Combine multiple files.
    csvq -keep user_id,email ~/Downloads/report1.csv ~/Downloads/report2.csv
 `, Version)))
 
-	// TODO(adam): docs for additional flags
-	// // flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output") // TODO(adam):
+	// TODO(adam): support additional flags
+	// // flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output")
 	// // flagIndices    = flag.String("i", "", "Indicies to keep in output")
 	// // flagNotIndices = flag.String("I", "", "Indicies to remove from output")
 
