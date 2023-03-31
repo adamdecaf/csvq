@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -41,13 +40,12 @@ type File struct {
 
 type Line []string
 
-func HandleFile(opts FileOpts, file *os.File) (*File, error) {
-	if file == nil {
+func HandleFile(opts FileOpts, r io.Reader) (*File, error) {
+	if r == nil {
 		return nil, errors.New("missing file")
 	}
-	defer file.Close()
 
-	rdr := csv.NewReader(file)
+	rdr := csv.NewReader(r)
 	rdr.Comma = opts.Delimiter
 
 	// Until we handle flagIndices or flagNotIndices we assume the first record contains headers

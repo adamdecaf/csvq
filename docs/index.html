@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>csvq | Tooling</title>
+    <script src="./wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("./csvq.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+        });
+    </script>
+</head>
+<body>
+  <h3>csvq - Reduce CSV files</h3>
+  <p>
+    csvq is a Go cli tool for parsing and transforming CSV files. This is useful because often trimming down a CSV file can make processing it easier.
+  </p>
+  <form id="csvqform">
+    <textarea id="csvinput" name="csvinput" cols="150" rows="20" placeholder="Paste your CSV contents here..." required></textarea>
+    <br />
+    Delimiter: <input type="text" id="delim" name="delim" value=","/>
+    Show Headers: <input type="checkbox" id="showHeaders" name="showHeaders" />
+    Keep Cols: <input type="input" id="keepCols" name="keepCols" />
+    <br />
+    <textarea id="csvoutput" name="csvoutput" cols="150" rows="20" readonly></textarea>
+    <br />
+    <button type="submit" onclick="run(csvinput.value)">Run csvq</button>
+    <button type="button" onclick="clearForms()">Clear Forms</button>
+  </form>
+</body>
+<script>
+  const run = function(input) {
+    csvoutput.value = runner(input, JSON.stringify({
+      delimiter: delim.value.charCodeAt(),
+      showHeaders: showHeaders.checked,
+      keepCols: keepCols.value.split(","),
+    }));
+    csvoutput.setSelectionRange(0,0)
+    csvoutput.focus()
+  }
+
+  const clearForm = function(input) {
+    csvinput.value = ""
+    csvoutput.value = ""
+    delim.value = ","
+    showHeaders.checked = false
+    keepCols.value = ""
+  };
+
+  csvqform.addEventListener('submit', (event) => {
+    event.preventDefault();
+    run(csvinput.value);
+  })
+</script>
+</html>
