@@ -24,9 +24,6 @@ func runner() js.Func {
 			return fmt.Sprintf("Got %d arguments, expected 1", len(args))
 		}
 
-		fmt.Printf("\n%q\n", args[0].String())
-		fmt.Printf("\n%q\n", args[1].String())
-
 		input := strings.NewReader(args[0].String())
 		opts, err := parseFileOpts(args[1].String())
 		if err != nil {

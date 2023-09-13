@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package main
+package csvq
 
 import (
 	"fmt"
 	"strings"
 )
 
-func help() {
+func Help() {
+	//nolint:forbidigo
 	fmt.Printf(strings.TrimSpace(`
 csvq is a tool for parsing and transforming comma separated values (CSV) files. This tool allows
 for flexible transforms of data files.
@@ -52,14 +53,12 @@ Output CSV columns in a table.
 
 Combine multiple files.
    csvq -keep user_id,email ~/Downloads/report1.csv ~/Downloads/report2.csv
-`), Version)
+`+"\n"), Version)
 
 	// TODO(adam): support additional flags
 	// // flagIgnoreCols = flag.String("ignore", "", "Column headers to remove from output")
 	// // flagIndices    = flag.String("i", "", "Indicies to keep in output")
 	// // flagNotIndices = flag.String("I", "", "Indicies to remove from output")
-
-	fmt.Println("")
 
 	// // TODO(adam): flag to sort output (useful w/ '-format table')
 	// // IDEA: -sort.asc/-sort.desc 1 (index) or last_name (col name)

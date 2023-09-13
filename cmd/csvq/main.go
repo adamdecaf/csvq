@@ -24,6 +24,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/adamdecaf/csvq"
 	"github.com/adamdecaf/csvq/internal/cli"
 	"github.com/adamdecaf/csvq/internal/format"
 )
@@ -41,11 +42,11 @@ var (
 )
 
 func main() {
-	flag.Usage = help
+	flag.Usage = csvq.Help
 	flag.Parse()
 
 	if *flagVersion {
-		fmt.Printf("csvq %s", Version)
+		fmt.Printf("csvq %s", csvq.Version)
 		return
 	}
 
