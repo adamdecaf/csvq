@@ -34,6 +34,8 @@ var (
 	flagShowHeaders = flag.Bool("headers", false, "Print headers as first output line")
 
 	flagKeepCols = flag.String("keep", "", "Column headers to keep in output. Order of kept headers is maintained in output.")
+	flagMaskCols = flag.String("mask", "", "Columns to mask in output. Default is to hide the middle of the cell.")
+	flagMaskType = flag.String("mask.show", "ends", "Masking algorithm to be used. Options: ends, last-four")
 
 	flagFormat = flag.String("format", "", "Format to output resulting records in")
 
