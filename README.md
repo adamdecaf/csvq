@@ -19,6 +19,11 @@ go install github.com/adamdecaf/csvq/cmd/csvq@latest
 
 ## Usage
 
+Extract the score and name, sort by highest score
+```
+cat scores.csv | csvq -keep score,name | sort -r
+```
+
 Extract first_name and last_name columns (in that order). Sort results.
 ```
 csvq -keep first_name,last_name ~/Downloads/report.csv | sort -u
