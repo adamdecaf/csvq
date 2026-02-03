@@ -19,9 +19,11 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Files []*os.File
@@ -37,6 +39,47 @@ func (fs Files) Close() {
 
 func OpenPaths(paths []string) (Files, error) {
 	var out Files
+
+	// first check if the input is xml
+	var joined string
+
+	// Is there anything on stdin?
+	if stat, _ := os.Stdin.Stat(); (stat.Mode() & os.ModeCharDevice) == 0 {
+		bs, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return nil, fmt.Errorf("reading stdin: %w", err)
+		}
+		joined = string(bs)
+	} else {
+		if len(paths) > 0 {
+			joined = strings.TrimSpace(strings.Join(paths, " "))
+		}
+	}
+
+	// Read input as xml directly
+	if strings.Count(joined, ",") > 1 {
+		// assume the input is one file
+		fd, err := os.CreateTemp("", "csvq-stdin-*")
+		if err != nil {
+			return nil, fmt.Errorf("creating temp file for stdin: %w", err)
+		}
+
+		_, err = fd.WriteString(joined)
+		if err != nil {
+			return nil, fmt.Errorf("flushing stdin to tempfile: %w", err)
+		}
+
+		_, err = fd.Seek(0, io.SeekStart)
+		if err != nil {
+			return nil, fmt.Errorf("seek reset of tempfile: %w", err)
+		}
+
+		out = append(out, fd)
+
+		return out, nil
+	}
+
+	// Read files from disk
 	for i := range paths {
 		path, err := filepath.Abs(paths[i])
 		if err != nil {
