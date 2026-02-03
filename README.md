@@ -12,6 +12,11 @@ csvq is a CLI package for parsing and transforming CSV files. This is useful bec
 
 Download the [latest release for your architecture](https://github.com/adamdecaf/csvq/releases/latest).
 
+You can install from source:
+```
+go install github.com/adamdecaf/csvq/cmd/csvq@latest
+```
+
 ## Usage
 
 Extract first_name and last_name columns (in that order). Sort results.
