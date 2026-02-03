@@ -18,6 +18,7 @@
 package main
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"os"
@@ -41,8 +42,13 @@ var (
 	flagVersion = flag.Bool("version", false, "Print the version of csvq")
 )
 
+//go:embed help.txt
+var helpText string
+
 func main() {
-	flag.Usage = csvq.Help
+	flag.Usage = func() {
+		fmt.Println(helpText)
+	}
 	flag.Parse()
 
 	if *flagVersion {
@@ -56,6 +62,11 @@ func main() {
 		os.Exit(1)
 	}
 	defer files.Close()
+
+	if len(files) == 0 {
+		flag.Usage()
+		return
+	}
 
 	opts := cli.FileOpts{
 		Delimiter:   toRune(*flagDelimiter),

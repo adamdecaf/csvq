@@ -1,0 +1,39 @@
+csvq — Query and transform CSV files from the command line
+
+Usage:
+  csvq [flags] [file1.csv ...]
+
+Flags:
+  -d, -delimiter string     Field delimiter (default: ",")
+  -keep string              Comma-separated list of column names to keep
+                            (order is preserved in output)
+  -headers                  Include header row in output (default: false)
+  -format string            Output format
+                            Options: csv, tabs, table, json, jsonl (default: csv)
+  -v                        Enable verbose output
+  --version                 Show version and exit
+
+Examples:
+  # Keep only two columns (in specified order)
+  csvq -keep first_name,last_name users.csv
+
+  # Same, but output as nice table
+  csvq -keep first_name,last_name -format table users.csv
+
+  # Change input delimiter (e.g. semicolon)
+  csvq -d ';' -keep id,name,email accounts.csv
+
+  # Combine multiple files + keep selected columns
+  csvq -keep user_id,email,created_at file1.csv file2.csv file3.csv
+
+  # Pipe to other tools
+  csvq -keep email,plan users.csv | grep '@gmail.com' | sort -u
+
+  # Only headers + selected columns (useful for schema discovery)
+  csvq -headers -keep id,name,amount transactions.csv
+
+Notes:
+  • Column names in -keep are case-sensitive
+  • Missing columns in -keep are silently ignored
+  • All input files are expected to have the same headers when using -keep
+  • Use -format table for human-readable output during exploration
