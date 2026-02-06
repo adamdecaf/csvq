@@ -16,3 +16,47 @@
 // under the License.
 
 package format
+
+import (
+	"fmt"
+	"io"
+	"slices"
+	"strings"
+	"text/tabwriter"
+
+	"github.com/adamdecaf/csvq/internal/cli"
+)
+
+func writeTable(ww io.Writer, file *cli.File) error {
+	w := tabwriter.NewWriter(ww, 0, 0, 2, ' ', 0)
+
+	if file.Opts.ShowHeaders {
+		var line strings.Builder
+		for idx, hdr := range file.Opts.KeepCols {
+			if idx > 0 {
+				line.WriteString("\t")
+			}
+			line.WriteString(hdr)
+		}
+		fmt.Fprintln(w, line.String())
+	}
+
+	var positions []int
+	for _, name := range file.Opts.KeepCols {
+		idx := slices.Index(file.Headers, name)
+		positions = append(positions, idx)
+	}
+
+	for _, line := range file.Lines {
+		var buf strings.Builder
+		for col, posIdx := range positions {
+			if col > 0 {
+				buf.WriteString("\t")
+			}
+			buf.WriteString(line[posIdx])
+		}
+		fmt.Fprintln(w, buf.String())
+	}
+
+	return w.Flush()
+}

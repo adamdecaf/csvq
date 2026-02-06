@@ -32,7 +32,7 @@ func WriteFile(w io.Writer, format string, file *cli.File) error {
 	case "tab":
 		// TODO(adam):
 	case "table":
-		// TODO(adam):
+		return writeTable(w, file)
 	case "web":
 		// TODO(adam):
 	}
