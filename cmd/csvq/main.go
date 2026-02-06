@@ -99,6 +99,12 @@ func toRune(delim string) rune {
 }
 
 func splitStringList(input string) []string {
+	input = strings.TrimSpace(input)
+
+	if input == "" {
+		return nil
+	}
+
 	ss := strings.Split(input, ",")
 	for i := range ss {
 		ss[i] = strings.TrimSpace(ss[i])

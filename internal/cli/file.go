@@ -58,11 +58,15 @@ func HandleFile(opts FileOpts, r io.Reader) (*File, error) {
 		return nil, err
 	}
 
+	if len(opts.KeepCols) == 0 {
+		opts.KeepCols = headers
+	}
+
 	output := File{
 		Opts: opts,
 	}
-
 	toKeep := opts.KeepCols
+
 	for headIdx := range headers {
 		if len(toKeep) == 0 {
 			headerIndexes[headIdx] = headIdx // keep all cols, so maintain order
