@@ -17,4 +17,4 @@
 
 package csvq
 
-const Version = "v1.1.1"
+var Version string

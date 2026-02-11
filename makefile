@@ -1,3 +1,11 @@
+ifndef VERSION
+	VERSION := $(shell git describe --tags --abbrev=0)
+endif
+
+.PHONY: build
+build:
+	go build -o ./bin/csvq -ldflags "-X github.com/adamdecaf/csvq.Version=${VERSION}" github.com/adamdecaf/csvq/cmd/csvq
+
 .PHONY: check
 check:
 ifeq ($(OS),Windows_NT)
