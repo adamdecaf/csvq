@@ -36,6 +36,9 @@ var (
 
 	flagKeepCols = flag.String("keep", "", "Column headers to keep in output. Order of kept headers is maintained in output.")
 
+	flagSortAsc  = flag.String("sort.asc", "", "Comma-separated column headers to sort output by (ascending)")
+	flagSortDesc = flag.String("sort.dsc", "", "Comma-separated column headers to sort output by (descending)")
+
 	flagFormat = flag.String("format", "", "Format to output resulting records in")
 
 	flagVerbose = flag.Bool("v", false, "Enable verbose logging")
@@ -72,6 +75,8 @@ func main() {
 		Delimiter:   toRune(*flagDelimiter),
 		ShowHeaders: *flagShowHeaders,
 		KeepCols:    splitStringList(*flagKeepCols),
+		SortAsc:     splitStringList(*flagSortAsc),
+		SortDesc:    splitStringList(*flagSortDesc),
 	}
 
 	for i := range files {

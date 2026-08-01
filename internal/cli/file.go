@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 )
 
@@ -30,6 +31,8 @@ type FileOpts struct {
 	ShowHeaders bool
 
 	KeepCols []string
+	SortAsc  []string
+	SortDesc []string
 }
 
 type File struct {
@@ -103,5 +106,37 @@ func HandleFile(opts FileOpts, r io.Reader) (*File, error) {
 		output.Lines = append(output.Lines, line)
 	}
 
+	if len(opts.SortAsc) > 0 || len(opts.SortDesc) > 0 {
+		ascIdxs := resolveColIndices(output.Headers, opts.SortAsc)
+		dscIdxs := resolveColIndices(output.Headers, opts.SortDesc)
+
+		sort.SliceStable(output.Lines, func(i, j int) bool {
+			for _, idx := range ascIdxs {
+				if output.Lines[i][idx] != output.Lines[j][idx] {
+					return output.Lines[i][idx] < output.Lines[j][idx]
+				}
+			}
+			for _, idx := range dscIdxs {
+				if output.Lines[i][idx] != output.Lines[j][idx] {
+					return output.Lines[i][idx] > output.Lines[j][idx]
+				}
+			}
+			return false
+		})
+	}
 	return &output, nil
+}
+
+func resolveColIndices(headers []string, names []string) []int {
+	var idxs []int
+	for _, name := range names {
+		name = strings.TrimSpace(name)
+		for i, h := range headers {
+			if strings.EqualFold(strings.TrimSpace(h), name) {
+				idxs = append(idxs, i)
+				break
+			}
+		}
+	}
+	return idxs
 }
