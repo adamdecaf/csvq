@@ -21,12 +21,12 @@ go install github.com/adamdecaf/csvq/cmd/csvq@latest
 
 Extract the score and name, sort by highest score
 ```
-cat scores.csv | csvq -keep score,name | sort -r
+csvq -keep score,name -sort.dsc score scores.csv
 ```
 
 Extract first_name and last_name columns (in that order). Sort results.
 ```
-csvq -keep first_name,last_name ~/Downloads/report.csv | sort -u
+csvq -keep first_name,last_name -sort.asc last_name,first_name ~/Downloads/report.csv
 ```
 
 Change delimiter used in `report.csv`.

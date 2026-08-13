@@ -7,6 +7,8 @@ Flags:
   -d, -delimiter string     Field delimiter (default: ",")
   -keep string              Comma-separated list of column names to keep
                             (order is preserved in output)
+  -sort.asc string          Comma-separated columns to sort by (ascending)
+  -sort.dsc string          Comma-separated columns to sort by (descending)
   -headers                  Include header row in output (default: false)
   -format string            Output format
                             Options: csv, tabs, table, json, jsonl (default: csv)
@@ -19,6 +21,9 @@ Examples:
 
   # Same, but output as nice table
   csvq -keep first_name,last_name -format table users.csv
+
+  # Highest score first (numeric), then name
+  csvq -keep score,name -sort.dsc score testdata/scores.csv
 
   # Change input delimiter (e.g. semicolon)
   csvq -d ';' -keep id,name,email accounts.csv
@@ -35,5 +40,8 @@ Examples:
 Notes:
   • Column names in -keep are case-sensitive
   • Missing columns in -keep are silently ignored
+  • Sort columns must be present in the output (kept columns, or all columns)
+  • Mixed -sort.asc / -sort.dsc flags apply in the order given on the command line
+  • Numeric-looking cells are compared as numbers; everything else is a string
   • All input files are expected to have the same headers when using -keep
   • Use -format table for human-readable output during exploration
