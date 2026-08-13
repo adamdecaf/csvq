@@ -22,14 +22,23 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
+	"strconv"
 	"strings"
 )
+
+// SortKey is one output sort column. Desc is true for -sort.dsc.
+type SortKey struct {
+	Name string
+	Desc bool
+}
 
 type FileOpts struct {
 	Delimiter   rune
 	ShowHeaders bool
 
 	KeepCols []string
+	SortKeys []SortKey
 }
 
 type File struct {
@@ -103,5 +112,79 @@ func HandleFile(opts FileOpts, r io.Reader) (*File, error) {
 		output.Lines = append(output.Lines, line)
 	}
 
+	if len(opts.SortKeys) > 0 {
+		// Row values are stored in -keep order, which can differ from output.Headers.
+		resolved, err := resolveSortKeys(toKeep, opts.SortKeys)
+		if err != nil {
+			return nil, err
+		}
+		sort.SliceStable(output.Lines, func(i, j int) bool {
+			for _, key := range resolved {
+				cmp := compareCell(output.Lines[i][key.idx], output.Lines[j][key.idx])
+				if cmp == 0 {
+					continue
+				}
+				if key.desc {
+					return cmp > 0
+				}
+				return cmp < 0
+			}
+			return false
+		})
+	}
 	return &output, nil
+}
+
+type resolvedSortKey struct {
+	idx  int
+	desc bool
+}
+
+func resolveSortKeys(cols []string, keys []SortKey) ([]resolvedSortKey, error) {
+	var out []resolvedSortKey
+	for _, key := range keys {
+		name := strings.TrimSpace(key.Name)
+		if name == "" {
+			continue
+		}
+		idx := indexCol(cols, name)
+		if idx < 0 {
+			return nil, fmt.Errorf("unknown sort column %q", key.Name)
+		}
+		out = append(out, resolvedSortKey{idx: idx, desc: key.Desc})
+	}
+	return out, nil
+}
+
+func indexCol(cols []string, name string) int {
+	for i, col := range cols {
+		if strings.EqualFold(strings.TrimSpace(col), name) {
+			return i
+		}
+	}
+	return -1
+}
+
+// compareCell orders numeric-looking cells as numbers, otherwise as strings.
+func compareCell(a, b string) int {
+	an, aErr := strconv.ParseFloat(strings.TrimSpace(a), 64)
+	bn, bErr := strconv.ParseFloat(strings.TrimSpace(b), 64)
+	if aErr == nil && bErr == nil {
+		switch {
+		case an < bn:
+			return -1
+		case an > bn:
+			return 1
+		default:
+			return 0
+		}
+	}
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
 }
