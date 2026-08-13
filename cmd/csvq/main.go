@@ -36,8 +36,8 @@ var (
 
 	flagKeepCols = flag.String("keep", "", "Column headers to keep in output. Order of kept headers is maintained in output.")
 
-	flagSortAsc  = flag.String("sort.asc", "", "Comma-separated column headers to sort output by (ascending)")
-	flagSortDesc = flag.String("sort.dsc", "", "Comma-separated column headers to sort output by (descending)")
+	_ = flag.String("sort.asc", "", "Comma-separated column headers to sort output by (ascending)")
+	_ = flag.String("sort.dsc", "", "Comma-separated column headers to sort output by (descending)")
 
 	flagFormat = flag.String("format", "", "Format to output resulting records in")
 
@@ -75,8 +75,7 @@ func main() {
 		Delimiter:   toRune(*flagDelimiter),
 		ShowHeaders: *flagShowHeaders,
 		KeepCols:    splitStringList(*flagKeepCols),
-		SortAsc:     splitStringList(*flagSortAsc),
-		SortDesc:    splitStringList(*flagSortDesc),
+		SortKeys:    parseSortKeys(os.Args[1:]),
 	}
 
 	for i := range files {
@@ -115,4 +114,42 @@ func splitStringList(input string) []string {
 		ss[i] = strings.TrimSpace(ss[i])
 	}
 	return ss
+}
+
+// parseSortKeys walks argv so mixed -sort.asc / -sort.dsc flags keep invocation order.
+func parseSortKeys(args []string) []cli.SortKey {
+	var keys []cli.SortKey
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		val, desc, ok, skipNext := sortFlagValue(arg, args, i)
+		if !ok {
+			continue
+		}
+		if skipNext {
+			i++
+		}
+		for _, name := range splitStringList(val) {
+			keys = append(keys, cli.SortKey{Name: name, Desc: desc})
+		}
+	}
+	return keys
+}
+
+func sortFlagValue(arg string, args []string, i int) (val string, desc bool, ok bool, skipNext bool) {
+	name, inline, hasInline := strings.Cut(arg, "=")
+	switch name {
+	case "-sort.asc", "--sort.asc":
+		desc = false
+	case "-sort.dsc", "--sort.dsc":
+		desc = true
+	default:
+		return "", false, false, false
+	}
+	if hasInline {
+		return inline, desc, true, false
+	}
+	if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
+		return args[i+1], desc, true, true
+	}
+	return "", desc, true, false
 }
