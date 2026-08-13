@@ -22,9 +22,10 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v7
 
-    - name: Install make (Windows)
-      if: runner.os == 'Windows'
-      run: choco install -y make mingw
-
     - name: Check
+      if: runner.os != 'Windows'
       run: make check
+
+    - name: Test (Windows)
+      if: runner.os == 'Windows'
+      run: go test ./...
